@@ -7,13 +7,24 @@
 #include "Adafruit_GFX.h"
 
 #ifdef CORE_TEENSY
-	#define CLK 19
-	#define LAT 18
-	#define OE	17
-	#define A   23
-	#define B   22
-	#define C   21
-	#define D   20
+	#define CLK 22
+	#define LAT 21
+	#define OE	20
+	#define A   7
+	#define B   8
+	#define C   9
+	#define D   23
+	
+	#ifdef __IMXRT1062__ //Teensy 4.0
+
+	#define B2_PIN 5
+	#define G2_PIN 4
+	#define R2_PIN 3
+	#define B1_PIN 2
+	#define G1_PIN 1
+	#define R1_PIN 0
+	
+	#endif
 #endif
 
 class RGBmatrixPanel : public Adafruit_GFX {

@@ -1,18 +1,9 @@
-This is an Arduino library for our 16x32 and 32x32 RGB LED matrix panels
+This is an Arduino LED Matrix library with Teensy 4.0 support (arbitrary data pin support) for 16x32 and 32x32 RGB LED matrix panels. It's made from the Adafruit RGB-matrix-Panel libraries (https://github.com/adafruit/RGB-matrix-Panel) and an old unmerged pull request for Teensy (https://github.com/adafruit/RGB-matrix-Panel/pull/22/commits/4ad564be6bdb6f33c4303d124bb205222baa6597)
 
-Pick one up at http://www.adafruit.com/products/420 & http://www.adafruit.com/products/607 !
+This is purely a simple example to get a matrix panel up and running on the Teensy 4.0 (since there's currently no libraries to do this as of this commit). It provides functionality to drive all pins arbitrarily and they don't need to belong to the same port (because the Teensy 4.0 is a pin pushing beast).
 
+There's no changes to timing in the code so you'll need the Teensy 4.0 at 150MHz to get a stable image.
 
-Written by Limor Fried/Ladyada & Phil Burgess/PaintYourDragon for Adafruit Industries.  
-BSD license, all text above must be included in any redistribution
+Hopefully this will spur some further development elsewhere or you have fun with it!
 
-To download. click the ZIP (download) button, rename the uncompressed folder RGBLEDMatrix. 
-Check that the RGBmatrixPanel folder contains RGBmatrixPanel.cpp and RGBmatrixPanel.h
-
-Place the RGBmatrixPanel library folder your arduinosketchfolder/libraries/ folder. 
-You may need to create the libraries subfolder if its your first library. 
-Restart the IDE.
-
-
-We also have a great tutorial on Arduino library installation at:
-http://learn.adafruit.com/adafruit-all-about-arduino-libraries-install-use
+This comes with no warranty.

@@ -67,12 +67,46 @@ BSD license, all text above must be included in any redistribution.
  #define DATADIR  DDRD
  #define SCLKPORT PORTB
 #elif defined(CORE_TEENSY)
+#ifdef __IMXRT1062__ //Teensy 4.0
+	
+	#define swap(a, b) { int16_t t = a; a = b; b = t; }
+	
+	uint8_t DATAPORT;
+	
+	void setDataDir()
+	{
+		pinMode(R1_PIN, OUTPUT);
+		pinMode(R2_PIN, OUTPUT);
+		pinMode(G1_PIN, OUTPUT);
+		pinMode(G2_PIN, OUTPUT);
+		pinMode(B1_PIN, OUTPUT);
+		pinMode(B2_PIN, OUTPUT);
+	}
+	
+	void writeDataPort()
+	{
+		//Data alignment to original port pinout
+		//DATADIR = B11111100;
+		//           ^^^^^^
+		//           BGRBGR
+		//           222111
+		
+		digitalWriteFast(R1_PIN, (DATAPORT >> 2) & 0x01);
+		digitalWriteFast(G1_PIN, (DATAPORT >> 3) & 0x01);
+		digitalWriteFast(B1_PIN, (DATAPORT >> 4) & 0x01);
+		digitalWriteFast(R1_PIN, (DATAPORT >> 5) & 0x01);
+		digitalWriteFast(G1_PIN, (DATAPORT >> 6) & 0x01);
+		digitalWriteFast(B1_PIN, (DATAPORT >> 7) & 0x01);
+	}
 
+	void drawInterrupt();
+ 
+#else
  void drawInterrupt();
 
  #define DATAPORT PORTD
  #define DATADIR  DDRD
-
+#endif
 #else
  // Ports for "standard" boards (Arduino Uno, Duemilanove, etc.)
  #define DATAPORT PORTD
@@ -205,9 +239,14 @@ void RGBmatrixPanel::begin(void) {
   if (nRows > 8) {
 	  pinMode(D, OUTPUT); digitalWriteFast(D, LOW);
   }
-
+  
+  
+  #ifdef __IMXRT1062__ //Teensy 4.0
+  setDataDir();
+  #else
   DATADIR = B11111100;
   DATAPORT = 0;
+  #endif
 
   drawTimer.begin(drawInterrupt, 150);
 
@@ -580,6 +619,9 @@ void RGBmatrixPanel::updateDisplay(void) {
 		for (i = 0; i < WIDTH; i++)
 		{
 			DATAPORT = ptr[i];
+		    #ifdef __IMXRT1062__ //Teensy 4.0
+			writeDataPort();
+		    #endif
 			//SCLKPORT = tick; // Clock lo
 			digitalWriteFast(CLK, HIGH);
 			//SCLKPORT = tock; // Clock hip
@@ -606,6 +648,10 @@ void RGBmatrixPanel::updateDisplay(void) {
 				(ptr[i] << 6) |
 				((ptr[i + WIDTH] << 4) & 0x30) |
 				((ptr[i + WIDTH * 2] << 2) & 0x0C);
+				
+			#ifdef __IMXRT1062__ //Teensy 4.0
+			writeDataPort();
+		    #endif
 
 			//SCLKPORT = tick; // Clock lo
 			digitalWriteFast(CLK, HIGH);
