@@ -94,9 +94,9 @@ BSD license, all text above must be included in any redistribution.
 		digitalWriteFast(R1_PIN, (DATAPORT >> 2) & 0x01);
 		digitalWriteFast(G1_PIN, (DATAPORT >> 3) & 0x01);
 		digitalWriteFast(B1_PIN, (DATAPORT >> 4) & 0x01);
-		digitalWriteFast(R1_PIN, (DATAPORT >> 5) & 0x01);
-		digitalWriteFast(G1_PIN, (DATAPORT >> 6) & 0x01);
-		digitalWriteFast(B1_PIN, (DATAPORT >> 7) & 0x01);
+		digitalWriteFast(R2_PIN, (DATAPORT >> 5) & 0x01);
+		digitalWriteFast(G2_PIN, (DATAPORT >> 6) & 0x01);
+		digitalWriteFast(B2_PIN, (DATAPORT >> 7) & 0x01);
 	}
 
 	void drawInterrupt();
