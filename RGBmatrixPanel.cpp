@@ -128,7 +128,7 @@ static RGBmatrixPanel *activePanel = NULL;
 
 #ifdef CORE_TEENSY
 // Code common to both the 16x32 and 32x32 constructors:
-void RGBmatrixPanel::init(uint8_t rows, boolean dbuf, uint8_t width) {
+void RGBmatrixPanel::init(uint16_t rows, boolean dbuf, uint16_t width) {
 
 	nRows = rows; // Number of multiplexed rows; actual height is 2X this
 
@@ -147,10 +147,10 @@ void RGBmatrixPanel::init(uint8_t rows, boolean dbuf, uint8_t width) {
 }
 
 // Constructor for 32x32 or 32x64 panel:
-RGBmatrixPanel::RGBmatrixPanel(boolean dbuf, uint8_t width) :
-	Adafruit_GFX(width, 32) {
+RGBmatrixPanel::RGBmatrixPanel(boolean dbuf, uint16_t width, uint16_t height) :
+	Adafruit_GFX(width, height) {
 
-	init(16, dbuf, width);
+	init(height>>1, dbuf, width);
 }
 #else
 
@@ -222,12 +222,223 @@ RGBmatrixPanel::RGBmatrixPanel(
 }
 #endif
 
-void RGBmatrixPanel::begin(void) {
+//FM6126 reg functions from DFRobot library - https://github.com/DFRobot/DFRobot_RGBMatrix
+void RGBmatrixPanel::Write_REG1(uint16_t REG_DATA)
+{
+  digitalWrite(CLK, LOW);
+  digitalWrite(LAT, LOW);
+  
+  for(int i=0; i<11; i++)
+  {
+    int DIN = REG_DATA;
+    for(int j=0; j<16; j++)
+    {    
+      if(DIN & 0x8000)
+      {
+        digitalWrite(R1_PIN, HIGH);
+        digitalWrite(G1_PIN, HIGH);
+        digitalWrite(B1_PIN, HIGH);
+        digitalWrite(R2_PIN, HIGH);
+        digitalWrite(G2_PIN, HIGH);
+        digitalWrite(B2_PIN, HIGH);
+      }
+      else
+      {
+        digitalWrite(R1_PIN, LOW);
+      digitalWrite(G1_PIN, LOW);
+      digitalWrite(B1_PIN, LOW);
+      digitalWrite(R2_PIN, LOW);
+      digitalWrite(G2_PIN, LOW);
+      digitalWrite(B2_PIN, LOW); 
+      }
+      digitalWrite(CLK, LOW);
+      digitalWrite(CLK, HIGH);
+      DIN = DIN<<1;
+    }
+  }  
+  
+  int DIN = REG_DATA;
+  
+  for(int i=0; i<5; i++)
+  {    
+    if(DIN & 0x8000)
+    {
+      digitalWrite(R1_PIN, HIGH);
+        digitalWrite(G1_PIN, HIGH);
+        digitalWrite(B1_PIN, HIGH);
+        digitalWrite(R2_PIN, HIGH);
+        digitalWrite(G2_PIN, HIGH);
+        digitalWrite(B2_PIN, HIGH);
+    }
+    else
+    {
+      digitalWrite(R1_PIN, LOW);
+      digitalWrite(G1_PIN, LOW);
+      digitalWrite(B1_PIN, LOW);
+      digitalWrite(R2_PIN, LOW);
+      digitalWrite(G2_PIN, LOW);
+      digitalWrite(B2_PIN, LOW);
+    }
+      
+    digitalWrite(CLK, LOW);
+    digitalWrite(CLK, HIGH);
+    DIN = DIN<<1;
+  }
 
+  digitalWrite(LAT, HIGH);
+
+  for(int i=0; i<11; i++)
+  {        
+    if(DIN & 0x8000)
+    {
+      digitalWrite(R1_PIN, HIGH);
+        digitalWrite(G1_PIN, HIGH);
+        digitalWrite(B1_PIN, HIGH);
+        digitalWrite(R2_PIN, HIGH);
+        digitalWrite(G2_PIN, HIGH);
+        digitalWrite(B2_PIN, HIGH);
+    }
+    else
+    {
+      digitalWrite(R1_PIN, LOW);
+      digitalWrite(G1_PIN, LOW);
+      digitalWrite(B1_PIN, LOW);
+      digitalWrite(R2_PIN, LOW);
+      digitalWrite(G2_PIN, LOW);
+      digitalWrite(B2_PIN, LOW);
+    } 
+      
+    digitalWrite(CLK, LOW);
+    digitalWrite(CLK, HIGH);
+    DIN = DIN<<1;
+  }  
+  digitalWrite(CLK, LOW);
+  digitalWrite(LAT, LOW); 
+}
+
+void RGBmatrixPanel::Write_REG2(uint16_t REG_DATA)
+{
+  digitalWrite(CLK, LOW);
+  digitalWrite(LAT, LOW);
+  
+  for(int i=0; i<11; i++)
+  {
+    int DIN = REG_DATA;
+    for(int j=0; j<16; j++)
+    {    
+      if(DIN & 0x8000)
+      {
+        digitalWrite(R1_PIN, HIGH);
+        digitalWrite(G1_PIN, HIGH);
+        digitalWrite(B1_PIN, HIGH);
+        digitalWrite(R2_PIN, HIGH);
+        digitalWrite(G2_PIN, HIGH);
+        digitalWrite(B2_PIN, HIGH);
+      }
+      else
+      {
+        digitalWrite(R1_PIN, LOW);
+      digitalWrite(G1_PIN, LOW);
+      digitalWrite(B1_PIN, LOW);
+      digitalWrite(R2_PIN, LOW);
+      digitalWrite(G2_PIN, LOW);
+      digitalWrite(B2_PIN, LOW); 
+      }
+      digitalWrite(CLK, LOW);
+      digitalWrite(CLK, HIGH);
+      DIN = DIN<<1;
+    }
+  }  
+  
+  int DIN = REG_DATA;
+  
+  for(int i=0; i<4; i++)
+  {    
+    if(DIN & 0x8000)
+    {
+      digitalWrite(R1_PIN, HIGH);
+        digitalWrite(G1_PIN, HIGH);
+        digitalWrite(B1_PIN, HIGH);
+        digitalWrite(R2_PIN, HIGH);
+        digitalWrite(G2_PIN, HIGH);
+        digitalWrite(B2_PIN, HIGH);
+    }
+    else
+    {
+      digitalWrite(R1_PIN, LOW);
+      digitalWrite(G1_PIN, LOW);
+      digitalWrite(B1_PIN, LOW);
+      digitalWrite(R2_PIN, LOW);
+      digitalWrite(G2_PIN, LOW);
+      digitalWrite(B2_PIN, LOW);
+    }
+      
+    digitalWrite(CLK, LOW);
+    digitalWrite(CLK, HIGH);
+    DIN = DIN<<1;
+  }
+
+  digitalWrite(LAT, HIGH);
+
+  for(int i=0; i<12; i++)
+  {        
+    if(DIN & 0x8000)
+    {
+      digitalWrite(R1_PIN, HIGH);
+        digitalWrite(G1_PIN, HIGH);
+        digitalWrite(B1_PIN, HIGH);
+        digitalWrite(R2_PIN, HIGH);
+        digitalWrite(G2_PIN, HIGH);
+        digitalWrite(B2_PIN, HIGH);
+    }
+    else
+    {
+      digitalWrite(R1_PIN, LOW);
+      digitalWrite(G1_PIN, LOW);
+      digitalWrite(B1_PIN, LOW);
+      digitalWrite(R2_PIN, LOW);
+      digitalWrite(G2_PIN, LOW);
+      digitalWrite(B2_PIN, LOW);
+    } 
+      
+    digitalWrite(CLK, LOW);
+    digitalWrite(CLK, HIGH);
+    DIN = DIN<<1;
+  }  
+  digitalWrite(CLK, LOW);
+  digitalWrite(LAT, LOW); 
+}
+
+void RGBmatrixPanel::FM6126_Init(void)
+{
+	
+	  pinMode(CLK,OUTPUT);
+  pinMode(LAT,OUTPUT);
+  pinMode(OE,OUTPUT);
+  pinMode(R1_PIN,OUTPUT); //R1
+  pinMode(G1_PIN,OUTPUT); //G1
+  pinMode(B1_PIN,OUTPUT); //B1
+  pinMode(R2_PIN,OUTPUT); //R2
+  pinMode(G2_PIN,OUTPUT); //G2
+  pinMode(B2_PIN,OUTPUT); //B2
+  
+  int   REG1=0xFFC2;
+  int REG2_R=0x6862;
+  int REG2_G=0x6862;
+  int REG2_B=0x6862;
+  Write_REG1(0xFFC2);
+  Write_REG2(0x6862);
+}
+
+void RGBmatrixPanel::begin(void) {
+#ifdef __IMXRT1062__ //Teensy 4.0
+  FM6126_Init();
+#endif
+  
   backindex   = 0;                         // Back buffer
   buffptr     = matrixbuff[1 - backindex]; // -> front buffer
   activePanel = this;                      // For interrupt hander
-
+  
   // Enable all comm & address pins as outputs, set default states:
 #ifdef CORE_TEENSY
   pinMode(CLK, OUTPUT); digitalWriteFast(CLK, LOW);
@@ -239,6 +450,11 @@ void RGBmatrixPanel::begin(void) {
   if (nRows > 8) {
 	  pinMode(D, OUTPUT); digitalWriteFast(D, LOW);
   }
+  #ifdef __IMXRT1062__ //Teensy 4.0
+  if (nRows > 16) {
+	  pinMode(E, OUTPUT); digitalWriteFast(E, LOW);
+  }
+  #endif
   
   
   #ifdef __IMXRT1062__ //Teensy 4.0
@@ -248,7 +464,11 @@ void RGBmatrixPanel::begin(void) {
   DATAPORT = 0;
   #endif
 
-  drawTimer.begin(drawInterrupt, 150);
+  #ifdef __IMXRT1062__ //Teensy 4.0
+	  drawTimer.begin(drawInterrupt, 25);
+  #else
+	  drawTimer.begin(drawInterrupt, 50);  
+  #endif
 
 #else
   pinMode(_sclk , OUTPUT); SCLKPORT   &= ~sclkpin;  // Low
@@ -591,6 +811,14 @@ void RGBmatrixPanel::updateDisplay(void) {
 			if (row & 0x8) digitalWriteFast(D, HIGH);
 			else           digitalWriteFast(D, LOW);
 		}
+		#ifdef __IMXRT1062__ //Teensy 4.0
+		if (nRows > 16) { //Serial.println(row);
+			if (row == 0x10) digitalWriteFast(E, HIGH);
+			else if(row == 0x00) digitalWriteFast(E, LOW);
+			/*if (row & 0x10) digitalWriteFast(E, HIGH);
+			else digitalWriteFast(E, LOW);*/
+		}
+		#endif
 	}
 
 	// buffptr, being 'volatile' type, doesn't take well to optimization.
@@ -600,7 +828,7 @@ void RGBmatrixPanel::updateDisplay(void) {
 	//drawTimer.begin(drawInterrupt, 10000);
 	digitalWriteFast(OE, LOW); // Re-enable output
 	digitalWriteFast(LAT, LOW); // Latch down
-
+	
 	// Record current state of SCLKPORT register, as well as a second
 	// copy with the clock bit set.  This makes the innnermost data-
 	// pushing loops faster, as they can just set the PORT state and

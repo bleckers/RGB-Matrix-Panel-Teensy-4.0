@@ -4,7 +4,7 @@
  #include "WProgram.h"
  #include "pins_arduino.h"
 #endif
-#include "Adafruit_GFX.h"
+#include <Adafruit_GFX.h>
 
 #ifdef CORE_TEENSY
 	#define CLK 22
@@ -14,6 +14,7 @@
 	#define B   8
 	#define C   9
 	#define D   23
+	#define E   6
 	
 	#ifdef __IMXRT1062__ //Teensy 4.0
 
@@ -31,7 +32,7 @@ class RGBmatrixPanel : public Adafruit_GFX {
 
  public:
 #ifdef CORE_TEENSY
-	 RGBmatrixPanel(boolean dbuf, uint8_t width = 32);
+	 RGBmatrixPanel(boolean dbuf, uint16_t width = 64, uint16_t height = 64);
 #else
   // Constructor for 16x32 panel:
   RGBmatrixPanel(uint8_t a, uint8_t b, uint8_t c,
@@ -41,6 +42,10 @@ class RGBmatrixPanel : public Adafruit_GFX {
   RGBmatrixPanel(uint8_t a, uint8_t b, uint8_t c, uint8_t d,
     uint8_t sclk, uint8_t latch, uint8_t oe, boolean dbuf, uint8_t width=32);
 #endif
+
+void Write_REG1(uint16_t REG_DATA);
+void Write_REG2(uint16_t REG_DATA);
+void FM6126_Init(void);
 
   void
     begin(void),
@@ -61,7 +66,7 @@ class RGBmatrixPanel : public Adafruit_GFX {
  private:
 
   uint8_t         *matrixbuff[2];
-  uint8_t          nRows;
+  uint16_t          nRows;
   volatile uint8_t backindex;
   volatile boolean swapflag;
 
@@ -69,7 +74,7 @@ class RGBmatrixPanel : public Adafruit_GFX {
   IntervalTimer drawTimer;
 
   // Init/alloc code common to both constructors:
-  void init(uint8_t rows, boolean dbuf, uint8_t width);
+  void init(uint16_t rows, boolean dbuf, uint16_t width);
 
 #else
   // Init/alloc code common to both constructors:
